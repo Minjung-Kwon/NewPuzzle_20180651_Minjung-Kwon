@@ -19,6 +19,44 @@ float animation_time = 0.02f;
 int mixCount;
 
 
+
+
+
+void show_clock()       //현재 게임 진행 시간 보여주는 타이머 clock. 시간이 지나면  Fail 메시지 출력
+{
+
+    auto clock = Timer::create(100.f);
+    showTimer(clock);
+
+    start->show();
+    clock->start();
+
+    clock->setOnTimerCallback([&](TimerPtr clock)->bool {
+        showMessage("FAIL");
+
+        start->show();      //게임이 fail되면 다시 시작하는 버튼
+
+        return true;
+    });
+}
+
+
+
+void end_button()       //게임 중 재시작 버튼
+{
+
+    auto endButton = Object::create("Images-2/end.png", scene, 1100, 50);
+
+    endButton->setOnMouseCallback([&](ObjectPtr object, int x, int y, MouseAction action)->bool {
+        endGame();
+        return true;
+    });
+
+}
+
+
+
+
 int game_index(ObjectPtr piece)     //piece 인덱스를 찾아내는 함수
 {
     for (int i = 0; i < 16;i++)
@@ -91,6 +129,8 @@ void start_game()       //start 버튼 누를 때 한번에 50번 반복 섞기
     blank = 15;
     game_board[blank]->hide();
 
+
+
     start->hide();
 }
 
@@ -105,7 +145,7 @@ bool check_end()
 }
 
 
-void end_game()
+void end_game()     //게임성공
 {
     game_board[blank]->show();
     start->show();
@@ -148,10 +188,16 @@ void init_game()
     }
 
 
-    start = Object::create("Images-2/시작.png", scene, 470, 100);
+    start = Object::create("Images-2/시작.png", scene, 470, 200);
     start->setOnMouseCallback([&](ObjectPtr object, int x, int y, MouseAction action)->bool {       //시작 버튼
         start->hide();
-        
+
+        show_clock();       //시작 버튼 누르면 타이머 실행
+        end_button();       //게임 중간에 끝내는 버튼
+
+        auto clockback = Object::create("Images-2/시계투명.png", scene, 565, 670);
+  
+
         start_game();
 
 
@@ -172,8 +218,9 @@ void init_game()
         return 0;
     });
 
-
+    
 	startGame(scene);
+
 
 }
 
